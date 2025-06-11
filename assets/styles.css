@@ -1,0 +1,141 @@
+/* Reduce top padding of main content area */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 0rem;
+}
+
+/* Reduce space above the main title */
+.main h1:first-child {
+    margin-top: 0rem;
+    padding-top: 0rem;
+}
+
+/* Reduce header spacing */
+header[data-testid="stHeader"] {
+    height: 3rem;
+}
+
+/* Reduce sidebar top padding and spacing */
+.css-1d391kg {
+    padding-top: 0rem;
+}
+
+/* Alternative sidebar selectors for different Streamlit versions */
+section[data-testid="stSidebar"] > div {
+    padding-top: 1rem;
+}
+
+/* Reduce sidebar content top spacing */
+.css-1lcbmhc {
+    padding-top: 0rem;
+}
+
+/* Pull sidebar title up */
+.css-1lcbmhc h1:first-child {
+    margin-top: -0.3rem;
+    padding-top: 0rem;
+}
+
+/* Alternative selectors for sidebar title */
+section[data-testid="stSidebar"] h1 {
+    margin-top: -0.3rem !important;
+    padding-top: 0rem !important;
+}
+
+/* Target sidebar content specifically */
+.css-1d391kg h1 {
+    margin-top: -0.3rem !important;
+    padding-top: 0rem !important;
+}
+
+/* Most specific - target by text content */
+.css-1lcbmhc h1[data-testid]:first-child,
+.css-1d391kg h1:first-child {
+    margin-top: -0.6rem !important;
+    padding-top: 0rem !important;
+}
+
+/* Title with logo styling */
+.title-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.title-logo {
+    height: 2.5rem;
+    width: auto;
+    pointer-events: none;
+    cursor: default;
+}
+
+.title-text {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+/* Remove logo clickability and fullscreen button */
+[data-testid="column"]:first-child img {
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+[data-testid="column"]:first-child button {
+    display: none !important;
+}
+
+[data-testid="column"]:first-child [data-testid="stImageCaption"] {
+    display: none !important;
+}
+
+/* Hide fullscreen button specifically */
+[data-testid="StyledFullScreenButton"] {
+    display: none !important;
+}
+
+/* Reduce column gap for title - more specific */
+div[data-testid="column"]:first-child {
+    padding-right: 0 !important;
+    margin-right: -1rem !important;
+}
+
+div[data-testid="column"]:nth-child(2) {
+    padding-left: 0 !important;
+    margin-left: -1rem !important;
+}
+
+/* Hide automatic Streamlit sidebar navigation */
+[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* Also hide any sidebar navigation list */
+.css-1d391kg .css-1lcbmhc ul {
+    display: none !important;
+}
+
+/* Hide sidebar nav container */
+section[data-testid="stSidebar"] nav {
+    display: none !important;
+}
+
+/* Override primary button styling to ensure it's not red */
+.stButton > button[kind="primary"] {
+    background-color: #0066cc !important;
+    border-color: #0066cc !important;
+    color: white !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background-color: #0052a3 !important;
+    border-color: #0052a3 !important;
+}
+
+/* Ensure secondary buttons are neutral gray */
+.stButton > button[kind="secondary"] {
+    background-color: #f0f2f6 !important;
+    border-color: #d1d5db !important;
+    color: #374151 !important;
+}
