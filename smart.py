@@ -66,7 +66,7 @@ try:
     # Create title with logo - using even smaller first column and aggressive gap reduction
     col1, col2 = st.columns([0.06, 0.94])
     with col1:
-        st.image("assets/sides_bw.png", width=55)
+        st.image("assets/SIDES_bw.png", width=55)
     with col2:
         st.markdown('<h1 style="margin-top: 0; padding-top: 0; margin-left: -20px;">SMART: Sides Mastery Assessment & Review Tool</h1>', unsafe_allow_html=True)
 except FileNotFoundError:
