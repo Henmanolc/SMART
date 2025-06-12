@@ -49,7 +49,7 @@
 ---
 
 ### Question 3
-**Question**: Wie viele Kunden werden üblicherweise auf eine solche Instanz gelegt?
+**Question**: Wie viele Kunden werden üblicherweise auf eine Instanz gelegt?
 **Type**: multiple_choice
 **Difficulty**: 2
 
