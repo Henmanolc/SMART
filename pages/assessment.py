@@ -168,7 +168,7 @@ def render_assessment_page(question_loader):
             # Question text in a highlighted box
             st.markdown(f"""
             <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 5px solid #1f77b4;">
-            <h4 style="margin-top: 0;">{question['question']}</h4>
+            <h4 style="margin-top: 0; color: #000000;">{question['question']}</h4>
             </div>
             """, unsafe_allow_html=True)
             
@@ -180,6 +180,17 @@ def render_assessment_page(question_loader):
                 question['options'],
                 key=f"q_{current_q_idx}_{question.get('id', 0)}"
             )
+            
+            # Tips section (collapsible)
+            tips = question.get('tips', [])
+            if tips:
+                with st.expander("💡 Tipps anzeigen", expanded=False):
+                    st.write("**Hilfreiche Hinweise:**")
+                    for tip in tips:
+                        st.write(f"• {tip}")
+            else:
+                with st.expander("💡 Tipps anzeigen", expanded=False):
+                    st.info("Für diese Frage sind keine zusätzlichen Tipps verfügbar. Versuche, die Frage anhand Ihres Wissens zu beantworten.")
             
             st.markdown("---")
             
