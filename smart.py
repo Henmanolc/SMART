@@ -77,49 +77,45 @@ except FileNotFoundError:
     # Fallback if logo file doesn't exist
     st.title("📚 SMART: Sides Mastery Assessment & Review Tool")
 
-st.markdown("**Schulungssystem für Restaurant- und Kassensystem-Administration**")
-st.markdown("---")
-
-# Show general information about SMART for all users
-st.header("Willkommen bei SMART")
-st.write("""
-Das Sides Mastery Assessment & Review Tool hilft dir dabei, dein **Wissen über unsere Produkte** zu testen und zu verbessern. 
-Dieses interaktive **Schulungssystem** wurde speziell für Mitarbeiter entwickelt, die mit den unterschiedlichen Sides-Produkten arbeiten und ihre **Fachkompetenz** in verschiedenen Bereichen wie Systemkonfiguration, Artikelmanagement, Ecommerce und Zahlungsabwicklung vertiefen möchten. 
-Durch **strukturierte Assessments** mit verschiedenen Schwierigkeitsgraden kannst du deinen **Lernfortschritt** verfolgen und gezielt an deinen Schwächen arbeiten. 
-Das Tool bietet **detailliertes Feedback** zu deinen Antworten und hilft dir dabei, komplexe Systemzusammenhänge besser zu verstehen.
-""")
-
-st.subheader("**Verfügbare Module:**")
-
-# Create 3 columns for the module list
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown("""
-    - 🏪 Grundeinrichtung System & Administration
-    - 📦 Artikelkonfiguration & Warengruppen
-    - 💳 Zahlungsoptionen & Payment-Provider
-    - 🖥️ Hardware-Konfiguration (Drucker, Display)
-    """)
-
-with col2:
-    st.markdown("""
-    - 🧾 POS-System & Bestellabwicklung
-    - 🚚 Liefermanagement & DaaS Integration
-    - 👨‍🍳 Kitchen Manager & Küchenverwaltung
-    - 🏆 Loyalty Programme & Kundenbindung
-    """)
-
-with col3:
-    st.markdown("""
-    - 📱 Webshop, App & Self-Order Terminal
-    - 📊 Warenwirtschaft & Lagerverwaltung
-    """)
-
-st.markdown("---")
-
 # Authentication check and user-specific content
 if not st.session_state.get('current_user_id'):
+    # Show general information about SMART for unauthenticated users
+    st.header("Willkommen bei SMART")
+    st.write("""
+    Das Sides Mastery Assessment & Review Tool hilft dir dabei, dein **Wissen über unsere Produkte** zu testen und zu verbessern. 
+    Dieses interaktive **Schulungssystem** wurde speziell für Mitarbeiter entwickelt, die mit den unterschiedlichen Sides-Produkten arbeiten und ihre **Fachkompetenz** in verschiedenen Bereichen wie Systemkonfiguration, Artikelmanagement, Ecommerce und Zahlungsabwicklung vertiefen möchten. 
+    Durch **strukturierte Assessments** mit verschiedenen Schwierigkeitsgraden kannst du deinen **Lernfortschritt** verfolgen und gezielt an deinen Schwächen arbeiten. 
+    Das Tool bietet **detailliertes Feedback** zu deinen Antworten und hilft dir dabei, komplexe Systemzusammenhänge besser zu verstehen.
+    """)
+
+    st.subheader("**Verfügbare Module:**")
+
+    # Create 3 columns for the module list
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("""
+        - 🏪 Grundeinrichtung System & Administration
+        - 📦 Artikelkonfiguration & Warengruppen
+        - 💳 Zahlungsoptionen & Payment-Provider
+        - 🖥️ Hardware-Konfiguration (Drucker, Display)
+        """)
+
+    with col2:
+        st.markdown("""
+        - 🧾 POS-System & Bestellabwicklung
+        - 🚚 Liefermanagement & DaaS Integration
+        - 👨‍🍳 Kitchen Manager & Küchenverwaltung
+        - 🏆 Loyalty Programme & Kundenbindung
+        """)
+
+    with col3:
+        st.markdown("""
+        - 📱 Webshop, App & Self-Order Terminal
+        - 📊 Warenwirtschaft & Lagerverwaltung
+        """)
+
+    st.markdown("---")
     st.header("🔐 Anmeldung erforderlich")
     st.info("Bitte melde Dich in der Seitenleiste an oder erstelle einen neuen Account.")
     st.write("Nach der Anmeldung hast Du Zugang zu:")
@@ -130,6 +126,43 @@ if not st.session_state.get('current_user_id'):
 
 # Home page content for authenticated users
 if page == "Home":
+    st.header("Willkommen bei SMART")
+    st.write("""
+    Das Sides Mastery Assessment & Review Tool hilft dir dabei, dein **Wissen über unsere Produkte** zu testen und zu verbessern. 
+    Dieses interaktive **Schulungssystem** wurde speziell für Mitarbeiter entwickelt, die mit den unterschiedlichen Sides-Produkten arbeiten und ihre **Fachkompetenz** in verschiedenen Bereichen wie Systemkonfiguration, Artikelmanagement, Ecommerce und Zahlungsabwicklung vertiefen möchten. 
+    Durch **strukturierte Assessments** mit verschiedenen Schwierigkeitsgraden kannst du deinen **Lernfortschritt** verfolgen und gezielt an deinen Schwächen arbeiten. 
+    Das Tool bietet **detailliertes Feedback** zu deinen Antworten und hilft dir dabei, komplexe Systemzusammenhänge besser zu verstehen.
+    """)
+    
+    st.subheader("**Verfügbare Module:**")
+    
+    # Create 3 columns for the module list
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        - 🏪 Grundeinrichtung System & Administration
+        - 📦 Artikelkonfiguration & Warengruppen
+        - 💳 Zahlungsoptionen & Payment-Provider
+        - 🖥️ Hardware-Konfiguration (Drucker, Display)
+        """)
+    
+    with col2:
+        st.markdown("""
+        - 🧾 POS-System & Bestellabwicklung
+        - 🚚 Liefermanagement & DaaS Integration
+        - 👨‍🍳 Kitchen Manager & Küchenverwaltung
+        - 🏆 Loyalty Programme & Kundenbindung
+        """)
+    
+    with col3:
+        st.markdown("""
+        - 📱 Webshop, App & Self-Order Terminal
+        - 📊 Warenwirtschaft & Lagerverwaltung
+        """)
+
+    st.markdown("---")
+
     # User-specific metrics
     col1, col2, col3 = st.columns(3)
     
