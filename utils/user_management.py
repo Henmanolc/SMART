@@ -3,6 +3,11 @@ import os
 import streamlit as st
 from datetime import datetime
 
+# TODO: Implement password hashing for production security
+# Currently passwords are stored as plain text for development convenience
+# This allows administrators to see/reset passwords when users forget them
+# In a production environment, passwords should be hashed using bcrypt or similar
+
 def get_users_file():
     """Get the users registry file path."""
     data_dir = "data"
@@ -14,12 +19,16 @@ def load_users():
     """Load all registered users."""
     users_file = get_users_file()
     if not os.path.exists(users_file):
-        return pd.DataFrame(columns=['name', 'email', 'created_date', 'user_id'])
+        return pd.DataFrame(columns=['name', 'email', 'password', 'created_date', 'user_id'])
     
     try:
-        return pd.read_csv(users_file)
+        df = pd.read_csv(users_file)
+        # Add password column if it doesn't exist (backward compatibility)
+        if 'password' not in df.columns:
+            df['password'] = ''
+        return df
     except Exception:
-        return pd.DataFrame(columns=['name', 'email', 'created_date', 'user_id'])
+        return pd.DataFrame(columns=['name', 'email', 'password', 'created_date', 'user_id'])
 
 def save_users(users_df):
     """Save users registry."""
@@ -31,21 +40,30 @@ def save_users(users_df):
         st.error(f"Fehler beim Speichern der Benutzer: {e}")
         return False
 
-def create_user(name, email):
-    """Create a new user account."""
+def create_user(name, email, password):
+    """Create a new user account with password.
+    
+    Note: Password is stored as plain text for development/testing.
+    TODO: Hash passwords before storing in production environment.
+    """
     users_df = load_users()
     
     # Check if email already exists
     if email in users_df['email'].values:
         return False, "Email bereits registriert"
     
+    # Check if name already exists
+    if name in users_df['name'].values:
+        return False, "Name bereits registriert"
+    
     # Generate user ID
     user_id = f"user_{len(users_df) + 1:04d}"
     
-    # Add new user
+    # Add new user with plain text password (TODO: hash in production)
     new_user = pd.DataFrame({
         'name': [name],
         'email': [email],
+        'password': [password],  # Plain text storage for development
         'created_date': [datetime.now().isoformat()],
         'user_id': [user_id]
     })
@@ -56,6 +74,26 @@ def create_user(name, email):
         return True, user_id
     else:
         return False, "Fehler beim Speichern"
+
+def authenticate_user(name, password):
+    """Authenticate user with name and password.
+    
+    Note: Uses plain text password comparison for development.
+    TODO: Implement secure password hashing/verification for production.
+    """
+    users_df = load_users()
+    # Plain text password comparison (TODO: use hashed comparison in production)
+    user_row = users_df[(users_df['name'] == name) & (users_df['password'] == password)]
+    
+    if user_row.empty:
+        return None
+    
+    return {
+        'name': user_row.iloc[0]['name'],
+        'email': user_row.iloc[0]['email'],
+        'user_id': user_row.iloc[0]['user_id'],
+        'created_date': user_row.iloc[0]['created_date']
+    }
 
 def get_user_by_id(user_id):
     """Get user information by user ID."""
@@ -73,78 +111,81 @@ def get_user_by_id(user_id):
     }
 
 def render_user_selection():
-    """Render user selection or creation interface."""
-    #st.sidebar.markdown("---")
+    """Render user login or creation interface."""
     st.sidebar.subheader("👤 Benutzer")
     
     users_df = load_users()
     current_user_id = st.session_state.get('current_user_id', None)
     
-    # Always show user selection dropdown if users exist
-    if not users_df.empty:
-        # Create user display list
-        user_options = ["Benutzer auswählen..."] + [
-            f"{row['name']} ({row['email']})" 
-            for _, row in users_df.iterrows()
-        ]
-        
-        # Find current selection index
-        selected_index = 0
-        if current_user_id:
-            for i, (_, row) in enumerate(users_df.iterrows()):
-                if row['user_id'] == current_user_id:
-                    selected_index = i + 1
-                    break
-        
-        selected_option = st.sidebar.selectbox(
-            "Benutzer wählen:",
-            user_options,
-            index=selected_index,
-            key="user_selection"
-        )
-        
-        # Handle user selection
-        if selected_option != "Benutzer auswählen...":
-            # Extract email from selection
-            email = selected_option.split('(')[1].split(')')[0]
-            user_row = users_df[users_df['email'] == email].iloc[0]
-            
-            # Update session state if different user selected
-            if st.session_state.get('current_user_id') != user_row['user_id']:
-                st.session_state.current_user_id = user_row['user_id']
-                st.session_state.user_name = user_row['name']
-                st.session_state.user_email = user_row['email']
-                
-                # Clear data loading flags to force reload
+    # Show current user info if logged in
+    if current_user_id:
+        user_info = get_user_by_id(current_user_id)
+        if user_info:
+            st.sidebar.info(f"Angemeldet als: **{user_info['name']}**")
+            if st.sidebar.button("Abmelden", key="logout"):
+                # Clear session state
+                st.session_state.pop('current_user_id', None)
+                st.session_state.pop('user_name', None)
+                st.session_state.pop('user_email', None)
                 st.session_state.pop('assessment_history', None)
                 st.session_state.pop('data_loaded', None)
                 st.session_state.pop('last_loaded_user_id', None)
                 st.rerun()
+        st.sidebar.markdown("---")
+        return
     
-    # Show create user section (always visible, expanded if no users exist)
-    expand_create = users_df.empty
-    with st.sidebar.expander("Neuen Benutzer erstellen", expanded=expand_create):
-        name = st.text_input("Name", key="new_user_name")
-        email = st.text_input("Email", key="new_user_email")
+    # Login form
+    with st.sidebar.form("login_form"):
+        st.write("**Anmelden:**")
+        login_name = st.text_input("Name", key="login_name")
+        login_password = st.text_input("Passwort", type="password", key="login_password")
         
-        if st.button("Account erstellen", key="create_account"):
-            if name and email:
-                success, result = create_user(name, email)
-                if success:
-                    st.session_state.current_user_id = result
-                    user_info = get_user_by_id(result)
+        if st.form_submit_button("Anmelden"):
+            if login_name and login_password:
+                user_info = authenticate_user(login_name, login_password)
+                if user_info:
+                    st.session_state.current_user_id = user_info['user_id']
                     st.session_state.user_name = user_info['name']
                     st.session_state.user_email = user_info['email']
-                    st.success(f"Account erstellt! Benutzer-ID: {result}")
+                    
+                    # Clear data loading flags to force reload
+                    st.session_state.pop('assessment_history', None)
+                    st.session_state.pop('data_loaded', None)
+                    st.session_state.pop('last_loaded_user_id', None)
+                    st.success(f"Willkommen, {user_info['name']}!")
                     st.rerun()
                 else:
-                    st.error(result)
+                    st.error("Ungültiger Name oder Passwort")
             else:
-                st.error("Bitte Name und Email eingeben")
+                st.error("Bitte Name und Passwort eingeben")
     
-    # Show current user info
-    if st.session_state.get('current_user_id'):
-        user_info = get_user_by_id(st.session_state.current_user_id)
-        if user_info:
-            st.sidebar.info(f"Angemeldet als: **{user_info['name']}**")
+    # Create user section
+    expand_create = users_df.empty
+    with st.sidebar.expander("Neuen Benutzer erstellen", expanded=expand_create):
+        with st.form("create_user_form"):
+            name = st.text_input("Name", key="new_user_name")
+            email = st.text_input("Email", key="new_user_email")
+            password = st.text_input("Passwort", type="password", key="new_user_password")
+            password_confirm = st.text_input("Passwort bestätigen", type="password", key="new_user_password_confirm")
+            
+            if st.form_submit_button("Account erstellen"):
+                if name and email and password and password_confirm:
+                    if password != password_confirm:
+                        st.error("Passwörter stimmen nicht überein")
+                    elif len(password) < 4:
+                        st.error("Passwort muss mindestens 4 Zeichen lang sein")
+                    else:
+                        success, result = create_user(name, email, password)
+                        if success:
+                            st.session_state.current_user_id = result
+                            user_info = get_user_by_id(result)
+                            st.session_state.user_name = user_info['name']
+                            st.session_state.user_email = user_info['email']
+                            st.success(f"Account erstellt! Benutzer-ID: {result}")
+                            st.rerun()
+                        else:
+                            st.error(result)
+                else:
+                    st.error("Bitte alle Felder ausfüllen")
+    
     st.sidebar.markdown("---")

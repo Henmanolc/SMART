@@ -52,10 +52,14 @@ st.sidebar.title("Navigation")
 # Add user selection to sidebar
 render_user_selection()
 
-page = st.sidebar.selectbox(
-    "Bereich auswählen:",
-    ["Home", "Assessment", "Progress Tracking", "Settings"]
-)
+# Only show navigation if user is logged in
+if st.session_state.get('current_user_id'):
+    page = st.sidebar.selectbox(
+        "Bereich auswählen:",
+        ["Home", "Assessment", "Progress Tracking", "Settings"]
+    )
+else:
+    page = None
 
 # Initialize user data persistence only if user is logged in
 if st.session_state.get('current_user_id'):
@@ -63,12 +67,12 @@ if st.session_state.get('current_user_id'):
 
 # Main title with logo
 try:
-    # Create title with logo - using even smaller first column and aggressive gap reduction
-    col1, col2 = st.columns([0.06, 0.94])
+    # Create title with logo - better mobile layout
+    col1, col2 = st.columns([0.08, 0.92])
     with col1:
         st.image("assets/SIDES_bw.png", width=55)
     with col2:
-        st.markdown('<h1 style="margin-top: 0; padding-top: 0; margin-left: -20px;">SMART: Sides Mastery Assessment & Review Tool</h1>', unsafe_allow_html=True)
+        st.markdown('<h1 style="margin-top: 0; padding-top: 0; padding-left: 10px;">SMART: Sides Mastery Assessment & Review Tool</h1>', unsafe_allow_html=True)
 except FileNotFoundError:
     # Fallback if logo file doesn't exist
     st.title("📚 SMART: Sides Mastery Assessment & Review Tool")
@@ -76,45 +80,57 @@ except FileNotFoundError:
 st.markdown("**Schulungssystem für Restaurant- und Kassensystem-Administration**")
 st.markdown("---")
 
-# Home page
-if page == "Home":
-    st.header("Willkommen bei SMART")
-    st.write("""
-    Das Sides Mastery Assessment & Review Tool hilft dir dabei, dein **Wissen über unsere Produkte** zu testen und zu verbessern. 
-    Dieses interaktive **Schulungssystem** wurde speziell für Mitarbeiter entwickelt, die mit den unterschiedlichen Sides-Produkten arbeiten und ihre **Fachkompetenz** in verschiedenen Bereichen wie Systemkonfiguration, Artikelmanagement, Ecommerce und Zahlungsabwicklung vertiefen möchten. 
-    Durch **strukturierte Assessments** mit verschiedenen Schwierigkeitsgraden kannst du deinen **Lernfortschritt** verfolgen und gezielt an deinen Schwächen arbeiten. 
-    Das Tool bietet **detailliertes Feedback** zu deinen Antworten und hilft dir dabei, komplexe Systemzusammenhänge besser zu verstehen.
+# Show general information about SMART for all users
+st.header("Willkommen bei SMART")
+st.write("""
+Das Sides Mastery Assessment & Review Tool hilft dir dabei, dein **Wissen über unsere Produkte** zu testen und zu verbessern. 
+Dieses interaktive **Schulungssystem** wurde speziell für Mitarbeiter entwickelt, die mit den unterschiedlichen Sides-Produkten arbeiten und ihre **Fachkompetenz** in verschiedenen Bereichen wie Systemkonfiguration, Artikelmanagement, Ecommerce und Zahlungsabwicklung vertiefen möchten. 
+Durch **strukturierte Assessments** mit verschiedenen Schwierigkeitsgraden kannst du deinen **Lernfortschritt** verfolgen und gezielt an deinen Schwächen arbeiten. 
+Das Tool bietet **detailliertes Feedback** zu deinen Antworten und hilft dir dabei, komplexe Systemzusammenhänge besser zu verstehen.
+""")
+
+st.subheader("**Verfügbare Module:**")
+
+# Create 3 columns for the module list
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("""
+    - 🏪 Grundeinrichtung System & Administration
+    - 📦 Artikelkonfiguration & Warengruppen
+    - 💳 Zahlungsoptionen & Payment-Provider
+    - 🖥️ Hardware-Konfiguration (Drucker, Display)
     """)
-    
-    st.subheader("**Verfügbare Module:**")
-    
-    # Create 3 columns for the module list
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("""
-        - 🏪 Grundeinrichtung System & Administration
-        - 📦 Artikelkonfiguration & Warengruppen
-        - 💳 Zahlungsoptionen & Payment-Provider
-        - 🖥️ Hardware-Konfiguration (Drucker, Display)
-        """)
-    
-    with col2:
-        st.markdown("""
-        - 🧾 POS-System & Bestellabwicklung
-        - 🚚 Liefermanagement & DaaS Integration
-        - 👨‍🍳 Kitchen Manager & Küchenverwaltung
-        - 🏆 Loyalty Programme & Kundenbindung
-        """)
-    
-    with col3:
-        st.markdown("""
-        - 📱 Webshop, App & Self-Order Terminal
-        - 📊 Warenwirtschaft & Lagerverwaltung
-        """)
 
-    st.markdown("---")
+with col2:
+    st.markdown("""
+    - 🧾 POS-System & Bestellabwicklung
+    - 🚚 Liefermanagement & DaaS Integration
+    - 👨‍🍳 Kitchen Manager & Küchenverwaltung
+    - 🏆 Loyalty Programme & Kundenbindung
+    """)
 
+with col3:
+    st.markdown("""
+    - 📱 Webshop, App & Self-Order Terminal
+    - 📊 Warenwirtschaft & Lagerverwaltung
+    """)
+
+st.markdown("---")
+
+# Authentication check and user-specific content
+if not st.session_state.get('current_user_id'):
+    st.header("🔐 Anmeldung erforderlich")
+    st.info("Bitte melden Sie sich in der Seitenleiste an oder erstellen Sie einen neuen Account.")
+    st.write("Nach der Anmeldung haben Sie Zugang zu:")
+    st.write("- 📝 **Assessment Center** - Interaktive Tests zu verschiedenen Modulen")
+    st.write("- 📊 **Progress Tracking** - Verfolgen Sie Ihren Lernfortschritt")
+    st.write("- ⚙️ **Settings** - Personalisieren Sie Ihre Einstellungen")
+    st.stop()
+
+# Home page content for authenticated users
+if page == "Home":
+    # User-specific metrics
     col1, col2, col3 = st.columns(3)
     
     with col1:
