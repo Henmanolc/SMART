@@ -121,11 +121,11 @@ st.markdown("---")
 # Authentication check and user-specific content
 if not st.session_state.get('current_user_id'):
     st.header("🔐 Anmeldung erforderlich")
-    st.info("Bitte melde dich in der Seitenleiste an oder erstelle einen neuen Account.")
+    st.info("Bitte melde Dich in der Seitenleiste an oder erstelle einen neuen Account.")
     st.write("Nach der Anmeldung hast Du Zugang zu:")
     st.write("- 📝 **Assessment Center** - Interaktive Tests zu verschiedenen Modulen")
-    st.write("- 📊 **Progress Tracking** - Verfolgen Sie Ihren Lernfortschritt")
-    st.write("- ⚙️ **Settings** - Personalisieren Sie Ihre Einstellungen")
+    st.write("- 📊 **Progress Tracking** - Verfolge Deinen Lernfortschritt")
+    st.write("- ⚙️ **Settings** - Personalisiere Deine Einstellungen")
     st.stop()
 
 # Home page content for authenticated users
