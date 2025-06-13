@@ -1,6 +1,6 @@
 # SMART: Sides Mastery Assessment & Review Tool
 
-Ein interaktives Schulungssystem für Restaurant- und Kassensystem-Administration mit Fokus auf Sides-POS-Systeme.
+Verbessere deine Fachkompetenz mit SMART, dem SIDES Mastery Assessment & Review Tool! Dieses interaktive Schulungssystem hilft Mitarbeitern, unsere Produkte zu meistern – von der Systemeinrichtung über den Küchenmanager bis hin zu E-Commerce und Zahlungen. Verfolge deinen Fortschritt, erhalte detailliertes Feedback und festige dein Verständnis mit strukturierten Assessments.
 
 ## 🚀 Features
 
