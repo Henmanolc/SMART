@@ -2,6 +2,11 @@ import pandas as pd
 import os
 from datetime import datetime
 import streamlit as st
+from .supabase_backend import (
+    load_assessments_from_supabase,
+    save_assessment_to_supabase,
+    is_supabase_available
+)
 
 def get_user_data_file():
     """Get the user data CSV file path based on user ID."""
@@ -45,7 +50,14 @@ def save_assessment_history():
         st.error(f"Fehler beim Speichern der Daten: {e}")
 
 def load_assessment_history():
-    """Load assessment history from CSV file."""
+    """Load assessment history from Supabase or CSV file."""
+    user_id = st.session_state.get('current_user_id', 'default_user')
+    
+    # Try Supabase first (for cloud deployment)
+    if is_supabase_available():
+        return load_assessments_from_supabase(user_id)
+    
+    # Fallback to local CSV (for local development)
     file_path = get_user_data_file()
     
     if not os.path.exists(file_path):
@@ -102,4 +114,12 @@ def auto_save_assessment(assessment_result):
         st.session_state.assessment_history = []
     
     st.session_state.assessment_history.append(assessment_result)
-    save_assessment_history()
+    
+    user_id = st.session_state.get('current_user_id', 'default_user')
+    
+    # Try Supabase first
+    if is_supabase_available():
+        save_assessment_to_supabase(user_id, assessment_result)
+    else:
+        # Fallback to local CSV
+        save_assessment_history()

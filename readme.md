@@ -8,40 +8,27 @@ Ein interaktives Schulungssystem für Restaurant- und Kassensystem-Administratio
 - **Modulare Fragen**: 10+ verschiedene Themenbereiche (Grundeinrichtung, Artikelkonfiguration, Zahlungsoptionen, etc.)
 - **Schwierigkeitsgrade**: Anpassbare Schwierigkeitsstufen (1-5 Sterne)
 - **Intelligente Fragenselektion**: Automatische Auswahl von bis zu 20 Fragen pro Assessment
-  - **Maximum 20 Fragen**: Assessments sind auf maximal 20 Fragen begrenzt
-  - **Zufällige Auswahl**: Bei mehr als 20 verfügbaren Fragen wird eine zufällige Stichprobe gezogen
-  - **Schwierigkeitsfilter**: Nur Fragen innerhalb des gewählten Schwierigkeitsbereichs werden berücksichtigt
-  - **Wiederholbarkeit**: Jeder Assessment-Durchlauf kann unterschiedliche Fragen enthalten
 - **Echtzeitfeedback**: Sofortige Bewertung mit detaillierter Analyse
+- **Tipps-System**: Kollabierbare Hilfestellungen während der Assessments
 - **Detaillierte Ergebnisse**: Frage-für-Frage Auswertung mit Erklärungen und Tipps
 
 ### 👤 Benutzerverwaltung
 - **Passwort-basierte Authentifizierung**: Sichere Anmeldung mit Name und Passwort
 - **Account-Erstellung**: Registrierung mit Name, E-Mail und Passwort (mit Bestätigung)
 - **Multi-User-Support**: Mehrere Benutzer können das System nutzen
-- **Persistente Daten**: Fortschritt wird automatisch gespeichert
+- **Cloud-Datenspeicherung**: Supabase Backend für persistente Daten
 - **Session-Management**: Automatische Abmeldung und sichere Sitzungsverwaltung
 - **Passwort-Sicherheit**: Mindestlänge von 4 Zeichen erforderlich
 
-### 🏆 Gamification & Progress Tracking
-- **Achievement-System**: 13 verschiedene Errungenschaften
-  - Grundlagen: Erstes Assessment, Assessment-Serie, Assessment-Veteran, Assessment-König
-  - Leistung: Perfektionist, Konsistenz-Champion, Flawless Victory
-  - Vielfalt: Multi-Talent, Wissensdurst, Master-Student
-  - Geschwindigkeit: Blitzschnell
-  - Aktivität: Learning Streak, Wochenkrieger
-- **Fortschrittsanzeige**: Visuelle Progress-Bars für verschiedene Ziele
-- **Statistiken**: Durchschnittsergebnisse, absolvierte Tests, Modulabdeckung
-
 ### 📊 Datenmanagement
-- **CSV-basierte Speicherung**: Keine Datenbank erforderlich
+- **Supabase Backend**: Cloud-basierte PostgreSQL-Datenbank
+- **Hybrid-Ansatz**: Automatischer Fallback auf lokale CSV-Dateien
 - **Automatische Backups**: Daten werden nach jedem Assessment gespeichert
 - **Export-Funktion**: CSV-Export der Assessment-Daten
-- **Datentrennung**: Separate Dateien für jeden Benutzer
+- **Skalierbar**: Unterstützt unbegrenzte Benutzer und Assessments
 
-## 🛠️ Technische Struktur
+### 🛠️ Technische Struktur
 
-### Hauptkomponenten
 ```
 smart.py                 # Hauptanwendung und Navigation
 ├── pages/
@@ -49,80 +36,84 @@ smart.py                 # Hauptanwendung und Navigation
 │   ├── progress.py      # Fortschrittsverfolgung
 │   └── settings.py      # Benutzereinstellungen
 ├── utils/
-│   ├── data_persistence.py  # Datenspeicherung
+│   ├── data_persistence.py  # Hybrid-Datenspeicherung
 │   ├── user_management.py   # Benutzerverwaltung
+│   ├── supabase_backend.py  # Supabase-Integration
 │   └── questionLoader.py    # Fragen-Management
 ```
 
-### Datenstruktur
-```
-data/
-├── users.csv                    # Benutzerregister mit Passwörtern
-└── user_data_{user_id}.csv      # Individuelle Assessment-Daten
-```
+### 📊 Datenarchitektur
 
-### Frontend
-- **Streamlit**: Moderne Web-UI
-- **Responsive Design**: Optimiert für verschiedene Bildschirmgrößen
-- **Custom CSS**: Professionelles Styling
-- **Intuitive Navigation**: Sidebar-Navigation mit Dropdown
+**Cloud-First mit Fallback:**
+- **Primär**: Supabase (PostgreSQL) für Produktionsumgebung
+- **Fallback**: Lokale CSV-Dateien für Entwicklung/Offline-Betrieb
+
+```
+Supabase Tables:
+├── users (id, name, email, password, user_id, created_at)
+└── assessments (id, user_id, date, subject, difficulty, score, etc.)
+
+Local Fallback:
+├── data/users.csv
+└── data/user_data_{user_id}.csv
+```
 
 ## 📝 Installation & Setup
 
 ### Voraussetzungen
 ```bash
-# Mit requirements.txt (empfohlen)
 pip install -r requirements.txt
-
-# Oder manuell
-pip install streamlit pandas
 ```
 
-### Verzeichnisstruktur erstellen
+**Dependencies:**
+- `streamlit>=1.28.0`
+- `pandas>=1.5.0`
+- `supabase>=1.0.0,<2.0.0`
+
+### Supabase Setup
+1. **Erstelle Supabase Projekt** auf [supabase.com](https://supabase.com)
+2. **Erstelle Tabellen:**
+   ```sql
+   -- Users table
+   CREATE TABLE users (
+     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+     name text NOT NULL,
+     email text UNIQUE NOT NULL,
+     password text NOT NULL,
+     user_id text UNIQUE NOT NULL,
+     created_at timestamptz DEFAULT now()
+   );
+   
+   -- Assessments table
+   CREATE TABLE assessments (
+     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+     user_id text NOT NULL,
+     date timestamptz NOT NULL,
+     subject text NOT NULL,
+     difficulty int4 NOT NULL,
+     score float8 NOT NULL,
+     correct_answers int4 NOT NULL,
+     total_questions int4 NOT NULL,
+     duration_seconds float8 NOT NULL,
+     created_at timestamptz DEFAULT now()
+   );
+   ```
+3. **Deaktiviere RLS** für beide Tabellen (oder erstelle entsprechende Policies)
+
+### Lokale Entwicklung
+Erstelle `.streamlit/secrets.toml`:
+```toml
+[supabase]
+url = "https://your-project.supabase.co"
+anon_key = "your-anon-key"
 ```
-SMART/
-├── smart.py
-├── requirements.txt     # Python-Dependencies
-├── pages/
-├── utils/
-├── assets/
-│   ├── styles.css
-│   └── sides_bw.png
-├── questions/           # Fragen-Markdown-Dateien
-└── data/               # Wird automatisch erstellt
-```
 
-### Starten
-```bash
-streamlit run smart.py
-```
-
-## 📖 Fragen-Format
-
-Fragen werden als Markdown-Dateien im `questions/` Ordner gespeichert:
-
-```markdown
-# Modulname
-
-## Metadata
-- **Difficulty**: 1-5
-- **Category**: Training
-- **Duration**: 10 minutes
-- **Tags**: e.g. setup, configuration
-
-## Question 1
-**Difficulty:** 2
-**Question:** Wie konfiguriert man...?
-**Options:**
-- A) Option 1
-- B) Option 2  
-- C) Option 3
-- D) Option 4
-**Correct:** A
-**Explanation:** Detaillierte Erklärung...
-**Tips:**
-- Tipp 1
-- Tipp 2
+### Produktionsdeployment
+Füge in Streamlit Cloud Secrets hinzu:
+```toml
+[supabase]
+url = "https://your-project.supabase.co"
+anon_key = "your-anon-key"
 ```
 
 ## 🎯 Verwendung
@@ -148,110 +139,83 @@ Als Product Manager spielen wir eine entscheidende Rolle bei der Pflege und Erwe
 - **Edge Cases**: Seltene aber wichtige Anwendungsfälle abdecken
 - **Integration Points**: Schnittstellen und Abhängigkeiten zwischen Systemen
 
-### Für Administratoren
-1. **Fragen erstellen**: Markdown-Dateien im `questions/` Ordner
-2. **Benutzer verwalten**: Über die Sidebar-Benutzerauswahl
-3. **Fortschritt überwachen**: Export-Funktion in den Einstellungen
-
 ### Für Lernende
-1. **Account erstellen**: 
-   - Name, E-Mail und Passwort in der Sidebar eingeben
-   - Passwort bestätigen zur Vermeidung von Tippfehlern
-   - Automatische Anmeldung nach erfolgreicher Registrierung
-2. **Anmelden**: 
-   - Name und Passwort in der Sidebar eingeben
-   - Bei erfolgloser Anmeldung Fehlermeldung
-3. **Assessment starten**: Modul und Schwierigkeit wählen
-   - **Modulauswahl**: Gewünschtes Themengebiet auswählen
-   - **Schwierigkeitsgrad**: Maximale Schwierigkeitsstufe festlegen (1-5 Sterne)
-   - **Fragenauswahl**: System wählt automatisch bis zu 20 zufällige Fragen aus dem gefilterten Pool
-4. **Fortschritt verfolgen**: Progress Tracking Seite besuchen (enthält Review-Funktionalität)
-5. **Abmelden**: Über den "Abmelden"-Button in der Sidebar
-6. **Achievements sammeln**: Verschiedene Ziele erreichen
+1. **Account erstellen**: Name, E-Mail und Passwort eingeben
+2. **Anmelden**: Mit persönlichen Zugangsdaten
+3. **Assessment starten**: Modul und Schwierigkeitsgrad wählen
+4. **Tipps nutzen**: Bei schwierigen Fragen Hilfestellungen einblenden
+5. **Fortschritt verfolgen**: Persönliche Statistiken einsehen
+6. **Daten exportieren**: CSV-Export für eigene Auswertungen
 
-## 🔧 Konfiguration
+### Für Administratoren
+1. **Fragen verwalten**: Markdown-Dateien im `questions/` Ordner
+2. **Supabase Dashboard**: Direkter Zugriff auf Benutzerdaten
+3. **System-Monitoring**: Logs in Streamlit Cloud
 
-### Einstellungen
-- **Schwierigkeitsgrad**: Standard-Schwierigkeitsstufe
-- **Benachrichtigungen**: E-Mail-Erinnerungen (geplant)
-- **Auto-Save**: Automatisches Speichern des Fortschritts
-- **Erklärungen**: Zeige Erklärungen nach Antworten
+## 🔧 Sicherheit & Datenschutz
 
-### Anpassungen
-- **Styling**: `assets/styles.css` bearbeiten
-- **Logo**: `assets/sides_bw.png` ersetzen
-- **Module**: Neue Markdown-Dateien im `questions/` Ordner
+### Entwicklungsversion
+- **Passwörter**: Unverschlüsselt gespeichert (für einfache Administration)
+- **Zugriff**: Direkter Datenbankzugriff über Supabase Dashboard
+- **Backup**: Automatischer Fallback auf lokale Dateien
+
+### Produktionsempfehlungen
+- [ ] Passwort-Hashing implementieren (bcrypt)
+- [ ] Rate-Limiting für Login-Versuche
+- [ ] Audit-Logging für kritische Aktionen
+- [ ] HTTPS-Only Deployment
 
 ## 🌐 Deployment
 
-### Web-Hosting
-Das System ist web-hosting-ready:
-- Keine Datenbank erforderlich
-- CSV-basierte Datenspeicherung
-- Streamlit Cloud kompatibel
+### Streamlit Cloud
+1. **Repository**: Pushe Code zu GitHub
+2. **App erstellen**: Auf [share.streamlit.io](https://share.streamlit.io)
+3. **Secrets konfigurieren**: Supabase-Credentials hinzufügen
+4. **Domain**: Automatische .streamlit.app URL
 
-### Sicherheit
-- **Passwort-Authentifizierung**: Name/Passwort-basierte Anmeldung
-- **Session-Management**: Sichere Benutzersitzungen mit Abmeldefunktion
-- **Datentrennung**: Separate Assessment-Daten für jeden Benutzer
-- **Entwicklungshinweis**: Passwörter werden derzeit unverschlüsselt gespeichert
+### Skalierung
+- **Benutzer**: Unbegrenzt (Supabase Free Tier: 500MB)
+- **Assessments**: Unbegrenzt (abhängig von Speicherplatz)
+- **Concurrent Users**: Bis zu 1000 (Streamlit Cloud Limit)
 
 ## 📊 Datenformat
 
-### Assessment-Daten
-```csv
-date,subject,difficulty,score,correct_answers,total_questions,duration_seconds
-2025-01-11T10:30:00,Artikelkonfiguration,3,85.0,17,20,300.5
+### Supabase Schema
+```sql
+-- Beispiel-Daten
+users:
+  id: uuid
+  name: "Max Mustermann"
+  email: "max@example.com"
+  password: "securepass123"
+  user_id: "user_0001"
+  created_at: "2025-01-15T10:00:00Z"
+
+assessments:
+  id: uuid
+  user_id: "user_0001"
+  date: "2025-01-15T10:30:00Z"
+  subject: "Artikelkonfiguration"
+  difficulty: 3
+  score: 85.0
+  correct_answers: 17
+  total_questions: 20
+  duration_seconds: 300.5
 ```
 
-### Benutzer-Daten
-```csv
-name,email,password,created_date,user_id
-Max Mustermann,max@example.com,mypassword123,2025-01-11T09:00:00,user_0001
-```
+## 🚀 Performance
 
-**Hinweis zur Passwort-Sicherheit:**
-- Passwörter werden derzeit als Klartext gespeichert (Entwicklungsversion)
-- Dies ermöglicht Administratoren das Zurücksetzen vergessener Passwörter
-- Für Produktionsumgebungen sollte eine Passwort-Verschlüsselung implementiert werden
+### Optimierungen
+- **Supabase**: Globales CDN für schnelle Datenbankzugriffe
+- **Streamlit Caching**: Question Loader wird gecacht
+- **Hybrid Storage**: Lokaler Fallback verhindert Ausfälle
+- **Lazy Loading**: Daten werden nur bei Bedarf geladen
 
-## 🎨 UI-Features
-
-### Responsive Design
-- **Sidebar-Navigation**: Kompakte Benutzerführung
-- **Progress-Bars**: Visuelle Fortschrittsanzeige
-- **Achievement-Badges**: Gamification-Elemente
-- **Metriken**: Übersichtliche Statistiken
-
-### Accessibility
-- **Emoji-Icons**: Intuitive Symbolik
-- **Klare Struktur**: Logische Informationsarchitektur
-- **Feedback-System**: Sofortige Rückmeldungen
-
-## 🔄 Roadmap
-
-### Geplante Features
-- [ ] Passwort-Verschlüsselung für Produktionsumgebung
-- [ ] Passwort-Reset-Funktionalität
-- [ ] E-Mail-Benachrichtigungen
-- [ ] Erweiterte Statistiken
-- [ ] Team-Funktionen
-- [ ] Mobile App
-- [ ] API-Integration
-
-### Bekannte Limitationen
-- **Entwicklungsversion**: Passwörter werden unverschlüsselt gespeichert
-- CSV-basierte Speicherung (skalierbar bis ~1000 Benutzer)
-- Keine Echtzeitaktualisierung zwischen Benutzern
-- Keine Passwort-Reset-Funktion ohne Administratorzugriff
-
-## 📞 Support
-
-Bei Fragen oder Problemen:
-1. README.md durchlesen
-2. Code-Kommentare prüfen
-3. Issues auf GitHub erstellen
+### Monitoring
+- **Streamlit Cloud**: Automatisches Performance-Monitoring
+- **Supabase**: Built-in Database-Metriken
+- **Error Tracking**: Detaillierte Fehlermeldungen
 
 ---
 
-*SMART v1.0 - Entwickelt für Sides ystem-Training*
+*SMART v2.0 - Cloud-Native Training Platform - Entwickelt für Sides System-Training*
