@@ -16,10 +16,12 @@ Ein interaktives Schulungssystem für Restaurant- und Kassensystem-Administratio
 - **Detaillierte Ergebnisse**: Frage-für-Frage Auswertung mit Erklärungen und Tipps
 
 ### 👤 Benutzerverwaltung
-- **Einfache Registrierung**: Nur Name und E-Mail erforderlich
+- **Passwort-basierte Authentifizierung**: Sichere Anmeldung mit Name und Passwort
+- **Account-Erstellung**: Registrierung mit Name, E-Mail und Passwort (mit Bestätigung)
 - **Multi-User-Support**: Mehrere Benutzer können das System nutzen
 - **Persistente Daten**: Fortschritt wird automatisch gespeichert
-- **Geräteübergreifend**: Zugriff von jedem Computer durch Benutzerauswahl
+- **Session-Management**: Automatische Abmeldung und sichere Sitzungsverwaltung
+- **Passwort-Sicherheit**: Mindestlänge von 4 Zeichen erforderlich
 
 ### 🏆 Gamification & Progress Tracking
 - **Achievement-System**: 13 verschiedene Errungenschaften
@@ -55,7 +57,7 @@ smart.py                 # Hauptanwendung und Navigation
 ### Datenstruktur
 ```
 data/
-├── users.csv                    # Benutzerregister
+├── users.csv                    # Benutzerregister mit Passwörtern
 └── user_data_{user_id}.csv      # Individuelle Assessment-Daten
 ```
 
@@ -151,13 +153,20 @@ Als Product Manager spielen wir eine entscheidende Rolle bei der Pflege und Erwe
 3. **Fortschritt überwachen**: Export-Funktion in den Einstellungen
 
 ### Für Lernende
-1. **Anmelden**: Name und E-Mail in der Sidebar eingeben
-2. **Assessment starten**: Modul und Schwierigkeit wählen
+1. **Account erstellen**: 
+   - Name, E-Mail und Passwort in der Sidebar eingeben
+   - Passwort bestätigen zur Vermeidung von Tippfehlern
+   - Automatische Anmeldung nach erfolgreicher Registrierung
+2. **Anmelden**: 
+   - Name und Passwort in der Sidebar eingeben
+   - Bei erfolgloser Anmeldung Fehlermeldung
+3. **Assessment starten**: Modul und Schwierigkeit wählen
    - **Modulauswahl**: Gewünschtes Themengebiet auswählen
    - **Schwierigkeitsgrad**: Maximale Schwierigkeitsstufe festlegen (1-5 Sterne)
    - **Fragenauswahl**: System wählt automatisch bis zu 20 zufällige Fragen aus dem gefilterten Pool
-3. **Fortschritt verfolgen**: Progress Tracking Seite besuchen (enthält Review-Funktionalität)
-4. **Achievements sammeln**: Verschiedene Ziele erreichen
+4. **Fortschritt verfolgen**: Progress Tracking Seite besuchen (enthält Review-Funktionalität)
+5. **Abmelden**: Über den "Abmelden"-Button in der Sidebar
+6. **Achievements sammeln**: Verschiedene Ziele erreichen
 
 ## 🔧 Konfiguration
 
@@ -181,9 +190,10 @@ Das System ist web-hosting-ready:
 - Streamlit Cloud kompatibel
 
 ### Sicherheit
-- Keine Passwörter erforderlich
-- Einfache Benutzeridentifikation über Name/E-Mail
-- Lokale Datenspeicherung
+- **Passwort-Authentifizierung**: Name/Passwort-basierte Anmeldung
+- **Session-Management**: Sichere Benutzersitzungen mit Abmeldefunktion
+- **Datentrennung**: Separate Assessment-Daten für jeden Benutzer
+- **Entwicklungshinweis**: Passwörter werden derzeit unverschlüsselt gespeichert
 
 ## 📊 Datenformat
 
@@ -195,9 +205,14 @@ date,subject,difficulty,score,correct_answers,total_questions,duration_seconds
 
 ### Benutzer-Daten
 ```csv
-name,email,created_date,user_id
-Max Mustermann,max@example.com,2025-01-11T09:00:00,user_0001
+name,email,password,created_date,user_id
+Max Mustermann,max@example.com,mypassword123,2025-01-11T09:00:00,user_0001
 ```
+
+**Hinweis zur Passwort-Sicherheit:**
+- Passwörter werden derzeit als Klartext gespeichert (Entwicklungsversion)
+- Dies ermöglicht Administratoren das Zurücksetzen vergessener Passwörter
+- Für Produktionsumgebungen sollte eine Passwort-Verschlüsselung implementiert werden
 
 ## 🎨 UI-Features
 
@@ -215,6 +230,8 @@ Max Mustermann,max@example.com,2025-01-11T09:00:00,user_0001
 ## 🔄 Roadmap
 
 ### Geplante Features
+- [ ] Passwort-Verschlüsselung für Produktionsumgebung
+- [ ] Passwort-Reset-Funktionalität
 - [ ] E-Mail-Benachrichtigungen
 - [ ] Erweiterte Statistiken
 - [ ] Team-Funktionen
@@ -222,9 +239,10 @@ Max Mustermann,max@example.com,2025-01-11T09:00:00,user_0001
 - [ ] API-Integration
 
 ### Bekannte Limitationen
-- Einfache Benutzerauthentifizierung
+- **Entwicklungsversion**: Passwörter werden unverschlüsselt gespeichert
 - CSV-basierte Speicherung (skalierbar bis ~1000 Benutzer)
 - Keine Echtzeitaktualisierung zwischen Benutzern
+- Keine Passwort-Reset-Funktion ohne Administratorzugriff
 
 ## 📞 Support
 

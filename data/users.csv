@@ -1,2 +1,3 @@
-name,email,created_date,user_id
-Henry Bischoff,henry.bischoff@get-sides.de,2025-06-11T09:08:41.104092,user_0001
+name,email,created_date,user_id,password
+HenryBischoff,henry.bischoff@get-sides.de,2025-06-11T09:08:41.104092,user_0001,Test0815
+Test,test@get-sides.de,2025-06-13T07:02:53.955487,user_0002,Test0815
