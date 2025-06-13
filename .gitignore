@@ -192,3 +192,13 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Streamlit secrets (contains sensitive credentials)
+.streamlit/secrets.toml
+
+# Supabase service account (if any)
+supabase-service-account.json
+
+# Local development environment
+.env
+.env.local

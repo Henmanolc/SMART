@@ -2,6 +2,11 @@ import pandas as pd
 import os
 import streamlit as st
 from datetime import datetime
+from .supabase_backend import (
+    load_users_from_supabase,
+    save_user_to_supabase,
+    is_supabase_available
+)
 
 # TODO: Implement password hashing for production security
 # Currently passwords are stored as plain text for development convenience
@@ -16,7 +21,12 @@ def get_users_file():
     return os.path.join(data_dir, "users.csv")
 
 def load_users():
-    """Load all registered users."""
+    """Load all registered users from Supabase or local CSV."""
+    # Try Supabase first (for cloud deployment)
+    if is_supabase_available():
+        return load_users_from_supabase()
+    
+    # Fallback to local CSV (for local development)
     users_file = get_users_file()
     if not os.path.exists(users_file):
         return pd.DataFrame(columns=['name', 'email', 'password', 'created_date', 'user_id'])
@@ -41,11 +51,7 @@ def save_users(users_df):
         return False
 
 def create_user(name, email, password):
-    """Create a new user account with password.
-    
-    Note: Password is stored as plain text for development/testing.
-    TODO: Hash passwords before storing in production environment.
-    """
+    """Create a new user account with password."""
     users_df = load_users()
     
     # Check if email already exists
@@ -59,7 +65,14 @@ def create_user(name, email, password):
     # Generate user ID
     user_id = f"user_{len(users_df) + 1:04d}"
     
-    # Add new user with plain text password (TODO: hash in production)
+    # Try to save to Supabase first
+    if is_supabase_available():
+        if save_user_to_supabase(name, email, password, user_id):
+            return True, user_id
+        else:
+            return False, "Fehler beim Speichern in Supabase"
+    
+    # Fallback to local CSV
     new_user = pd.DataFrame({
         'name': [name],
         'email': [email],
