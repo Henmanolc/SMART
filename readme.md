@@ -105,9 +105,10 @@ Fragen werden als Markdown-Dateien im `questions/` Ordner gespeichert:
 # Modulname
 
 ## Metadata
-- Category: Kategoriename
-- Author: Autorname
-- Version: 1.0
+- **Difficulty**: 1-5
+- **Category**: Training
+- **Duration**: 10 minutes
+- **Tags**: e.g. setup, configuration
 
 ## Question 1
 **Difficulty:** 2
